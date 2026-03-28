@@ -1,11 +1,13 @@
-const CACHE_NAME = "work-time-cache-v1";
+const CACHE_NAME = "work-time-v2";
+
 const urlsToCache = [
   "./",
   "./index.html",
-  "./manifest.json"
+  "./manifest.json",
   "./icon.png"
 ];
 
+// Install
 self.addEventListener("install", event => {
   event.waitUntil(
     caches.open(CACHE_NAME)
@@ -13,6 +15,22 @@ self.addEventListener("install", event => {
   );
 });
 
+// Activate (cleanup old cache)
+self.addEventListener("activate", event => {
+  event.waitUntil(
+    caches.keys().then(keys =>
+      Promise.all(
+        keys.map(key => {
+          if (key !== CACHE_NAME) {
+            return caches.delete(key);
+          }
+        })
+      )
+    )
+  );
+});
+
+// Fetch
 self.addEventListener("fetch", event => {
   event.respondWith(
     caches.match(event.request)
